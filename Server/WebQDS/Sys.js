@@ -1,49 +1,37 @@
-Sys = {};
-
-Sys.Quit = function()
-{
-	process.exit(0);
-};
-
-Sys.Print = function(text)
-{
-	process.stdout.write(text);
-};
-
-Sys.Error = function(text)
-{
-	console.log(text);
-	throw new Error(text);
-};
-
-Sys.FloatTime = function()
-{
-	var time = process.hrtime(Sys.oldtime);
-	return time[0] + (time[1] / 1000000000.0);
-};
-
-Sys.cmd = '';
-Sys.ConsoleInput = function()
-{
-	var text = Sys.cmd;
-	if (text.length === 0)
-		return;
-	Sys.cmd = '';
-	return text;
-};
-
-Sys.main = function()
-{
-	COM.InitArgv(process.argv.slice(1));
-	Sys.oldtime = process.hrtime();
-	Sys.Print('Host.Init\n');
-	Host.Init();
-	process.stdin.resume();
-	process.stdin.on('data', Sys.StdinOnData);
-	process.nextTick(Host.Frame);
-};
-
-Sys.StdinOnData = function(data)
-{
-	Sys.cmd += Q.memstr(data);
-};
+const sysClass = function(){
+     this.Quit = function(){
+         process.exit(0);
+     };
+     this.Print = function(text) {
+         process.stdout.write(text);
+     };
+     this.Error = function(text) {
+         throw new Error(text);
+     };
+     this.FloatTime = function() {
+         let time = process.hrtime(oldtime);
+         return time[0] + (time[1] / 1000000000.0);
+     };
+     this.ConsoleInput = function(){
+         if (cmd.length === 0)
+             return;
+         const text = cmd.toString();
+         cmd = '';
+         return text;
+     };
+     this.main = function() {
+         COM.InitArgv(process.argv.slice(1));
+         oldtime = process.hrtime();
+         Sys.Print('Host.Init\n');
+         Host.Init();
+         process.stdin.resume();
+         process.stdin.on('data', Sys.StdinOnData);
+         process.nextTick(Host.Frame);
+     };
+     this.StdinOnData = function(data){
+         cmd += Q.memstr(data);
+     };
+     let cmd = '';
+     let oldtime = process.hrtime();
+}
+const Sys = new sysClass();
